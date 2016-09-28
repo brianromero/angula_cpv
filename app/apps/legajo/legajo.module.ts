@@ -1,5 +1,5 @@
 import {
-  AfterViewInit,ElementRef,Component
+  AfterViewInit, ElementRef, Component
 } from '@angular/core';
 import {
   NgModule
@@ -41,34 +41,29 @@ import {
 import {DomSanitizer} from "@angular/platform-browser";
 @Component({
   templateUrl: 'app/apps/legajo/legajo.html',
-  providers: [LegajoService]  
+  providers: [LegajoService]
 })
 
-class Legajo{
+class Legajo {
 
-  private ccdd :any;
-  private ccpp :any;
-  private ccdi :any;
-  private zona :any;
-  private verZona=false;
-  private url :string='';
-  private urlCroquis :any;
-  private tabledata:boolean = false;
-  private seccionAux:boolean = false;
-  private aeuAux:boolean = false;
-  private distrito:boolean = false;
-  private registros:Object;
-  private registros2:Object;
-  private registro:RegistroInterface;
-  private departamentos:DepartamentoInterface;
-  private provincias:ProvinciaInterface;
-  private distritos:DistritoInterface;
-  private zonas:ZonaInterface;
-  private contador :number;
-
-  constructor(private legajoservice: LegajoService, private elementRef: ElementRef,private domSanitizer:DomSanitizer) {
+  private ccdd: any;
+  private ccpp: any;
+  private ccdi: any;
+  private zona: any;
+  private verZona = false;
+  private tabledata: boolean = false;
+  private distrito: boolean = false;
+  private registros: Object;
+  private registro: RegistroInterface;
+  private departamentos: DepartamentoInterface;
+  private provincias: ProvinciaInterface;
+  private distritos: DistritoInterface;
+  private zonas: ZonaInterface;
+  private tipo: number=0;
+  
+  constructor(private legajoservice: LegajoService, private elementRef: ElementRef, private domSanitizer: DomSanitizer) {
     this.cargarDepa()
-    this.cargarTabla("0","0","0","0","0")
+    this.cargarTabla("0", "0", "0", "0", "0")
     this.registro = this.model
   }
 
@@ -82,103 +77,101 @@ class Legajo{
 
   cargarProvincias(ccdd: string, ccpp: string = "0") {
     this.ccdd = ccdd;
-    this.distrito=false;
-    this.verZona=false;
-    if(this.ccdd!=0){
+    this.distrito = false;
+    this.verZona = false;
+    if (this.ccdd != 0) {
       this.legajoservice.getProvincias(ccdd, ccpp).subscribe(res => {
-        this.provincias = < ProvinciaInterface > res;
+        this.provincias = <ProvinciaInterface>res;
       })
-      this.cargarTabla("1",ccdd,"0","0","0")
-    }else{
-      this.provincias=null;
-      this.distritos=null;
-      this.zonas=null;
-      this.cargarTabla("0","0","0","0","0")
-    }    
+      this.cargarTabla("1", ccdd, "0", "0", "0")
+    } else {
+      this.provincias = null;
+      this.distritos = null;
+      this.zonas = null;
+      this.cargarTabla("0", "0", "0", "0", "0")
+    }
   }
 
   cargarDistritos(ccpp: string) {
-    this.ccpp=ccpp;
-    this.distrito=false;
-    this.verZona=false;
-    if(this.ccpp!=0){
-      this.legajoservice.getDistritos(this.ccdd, ccpp,"0").subscribe(res => {
-        this.distritos = < DistritoInterface > res;
+    this.ccpp = ccpp;
+    this.distrito = false;
+    this.verZona = false;
+    if (this.ccpp != 0) {
+      this.legajoservice.getDistritos(this.ccdd, ccpp, "0").subscribe(res => {
+        this.distritos = <DistritoInterface>res;
       })
-      this.cargarTabla("2",this.ccdd,ccpp,"0","0")
-    }else{
-      this.distritos=null;
-      this.zonas=null;
-      this.cargarTabla("1",this.ccdd,"0","0","0")
+      this.cargarTabla("2", this.ccdd, ccpp, "0", "0")
+    } else {
+      this.distritos = null;
+      this.zonas = null;
+      this.cargarTabla("1", this.ccdd, "0", "0", "0")
     }
   }
 
   cargarZonas(ccdi: string) {
     this.ccdi = ccdi;
-    this.verZona=false;
+    this.verZona = false;
     let ubigeo = this.ccdd + this.ccpp + ccdi;
     this.distrito = true;
-    if(this.ccdi!=0){
+    if (this.ccdi != 0) {
       this.legajoservice.getZonas(ubigeo).subscribe(res => {
-        this.zonas = < ZonaInterface > res;
+        this.zonas = <ZonaInterface>res;
       })
-      this.cargarTabla("3",this.ccdd,this.ccpp,this.ccdi,"0")      
-    }else{      
-      this.zonas=null;
+      this.cargarTabla("3", this.ccdd, this.ccpp, this.ccdi, "0")
+    } else {
+      this.zonas = null;
       this.distrito = false;
-      this.cargarTabla("2",this.ccdd,this.ccpp,"0","0")
+      this.cargarTabla("2", this.ccdd, this.ccpp, "0", "0")
     }
   }
 
   cargarAeu(zona: string) {
-    this.verZona=true;
-    this.zona=zona;
-    if(zona!="0"){
-      this.getRuta();
-      this.cargarTabla("4",this.ccdd,this.ccpp,this.ccdi,this.zona)
-    }else{
-      this.verZona=false;
-      this.cargarTabla("3",this.ccdd,this.ccpp,this.ccdi,"0")
+    this.verZona = true;
+    this.zona = zona;
+    if (zona != "0") {
+      this.cargarTabla("4", this.ccdd, this.ccpp, this.ccdi, this.zona)
+    } else {
+      this.verZona = false;
+      this.cargarTabla("3", this.ccdd, this.ccpp, this.ccdi, "0")
     }
   }
 
-  cargarTabla(tipo: string, ccdd: string, ccpp: string, ccdi: string, zona: string){
+  cargarTabla(tipo: string, ccdd: string, ccpp: string, ccdi: string, zona: string) {
     this.legajoservice.getTabla(tipo, ccdd, ccpp, ccdi, zona).subscribe(res => {
       this.tabledata = true;
-      this.registros= < RegistroInterface > res;
+      this.registros = <RegistroInterface>res;
     })
   }
 
-  getRegistro(tipo_cro) {
-    if(tipo_cro==0){
-      this.seccionAux=false;
-      this.aeuAux=false;
+  capturaEvento(event,etiqueta) {
+    if (event.key == "Enter") {
+      if(this.verificarCodigo(etiqueta)){
+        this.cargarTabla("0",this.ccdd,this.ccpp,this.ccdi,this.zona);
+      }else{
+        alert("CÓDIGO NO PERTENECE")
+      }
     }
-    if(tipo_cro==1){
-      this.seccionAux=true;
-      this.aeuAux=false;
-    }
-    if(tipo_cro==2){
-      this.seccionAux=true;
-      this.aeuAux=true;
-    }
-    this.url = tipo_cro +'/' + this.ccdd + '/' + this.ccpp + '/' + this.ccdi + '/' + this.zona + '/';
-    this.legajoservice.getRegistro(this.url).subscribe((data) => {
-      this.registros2 = < RegistroInterface > data;
-      console.log(this.registros2);            
-    })
   }
 
-  getRuta(){
-    let urlCroquisAux = this.ccdd + this.ccpp + this.ccdi + this.zona;
-    this.urlCroquis = this.domSanitizer.bypassSecurityTrustResourceUrl(`http://192.168.221.123/desarrollo/${urlCroquisAux}.pdf`);
-  }
+  verificarCodigo(codigo): boolean {
+    var valido: boolean=false
+    if (this.tipo == 0) { //aeu
+      
+    } else {
+      if (this.tipo == 1) { //seccion
 
-  verificarCodigo(abc){
-    console.log("entro...");
-    var keyCode=window.event.target;
-    console.log(keyCode);
-  }  
+      } else {
+        if (this.tipo == 2) { //zona
+
+        } else {
+          if (this.tipo == 3) { //distrito
+            
+          }
+        }
+      }
+    }
+    return valido
+  }
 }
 
 const routes: Routes = [{
@@ -187,7 +180,7 @@ const routes: Routes = [{
 }];
 
 @NgModule({
-  imports: [CommonModule,RouterModule.forChild(routes), FormsModule],
+  imports: [CommonModule, RouterModule.forChild(routes), FormsModule],
   declarations: [Legajo]
 })
-export default class LegajoModule {}
+export default class LegajoModule { }

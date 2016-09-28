@@ -44,8 +44,7 @@
     </div>
     <div class="col-md-3">
         <label for="lDistribucion1"><h5> CÓDIGO DE BARRAS</h5></label>
-        <label for="lDistribucion2"><h5> 02060100100101</h5></label>
-        <input type="text" onkeyup="verificarCodigo()" />
+        <input type="text" id="a" (keyup)="capturaEvento($event,$event.target.value)" placeholder="Código de barra"/>
     </div>
     <div class="col-md-3">
         <label for="lDetalle1"><h5> N° TOTAL:</h5></label>
@@ -62,12 +61,6 @@
     <div class="col-md-2">
         <button type="button" (click)="enviarUdra()" class="btn btn-primary" disabled>Enviar a udra</button>
     </div>
-
-
-    <!--<label><h5> LECTORA</h5></label>
-    <input ng-enter="verificarCodigo()">-->
-    
-
     <div class="col-md-12" align="left">
         <hr style="color: black; background-color: black; width:100%;" />
         <a class="btn btn-default" onclick="descargarCroExcel()">EXCEL <i class="fa fa-download"></i></a>
@@ -104,4 +97,3 @@
         </table>
     </div>
 </div>
-
